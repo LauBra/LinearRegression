@@ -1,0 +1,52 @@
+project:
+  type: website
+  output-dir: docs    # <- add / change this line
+  render: 
+  - "*.qmd"
+
+execute:
+  echo: true
+  python:
+    version: "r-reticulate"
+    
+website:
+  back-to-top-navigation: true
+  page-navigation: true
+  title: "HDS MSc - Module 3 - Supervised Learning: Linear Reg and Optimization"
+  navbar:
+    background: primary
+    search: true
+    left:
+      - text: "Supervised Learning: Linear Reg and Optimization"
+        file: SupervisedLearning.qmd
+ 
+  sidebar:
+    - title: "Supervised Learning: Linear Reg and Optimization"
+      contents:
+        - SupervisedLearningFINAL.qmd
+        - LossFunction_Final.qmd 
+        - MSE_Change_FINAL.qmd 
+        - divider: true  # Adds a divider
+        - OLS_Derivation.qmd
+        - GradientDescent2.qmd
+  
+  page-footer: 
+    left: "Copyright 2025, Laura Bravo" 
+    background: light
+    right: 
+      - icon: twitter 
+        href: https://twitter.com/laura_bravo94
+      - icon: github
+        href: https://github.com/LauBra/RIntro2023
+    
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+   # code-fold: true
+    code-tools: true
+    code-link: true
+
+editor: visual
+

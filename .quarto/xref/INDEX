@@ -1,0 +1,23 @@
+{
+  "DecisionThreshold.qmd": {
+    "DecisionThreshold.html": "19cd3a0a"
+  },
+  "GradientDescent2.qmd": {
+    "GradientDescent2.html": "f1f8893e"
+  },
+  "LossFunction_Final.qmd": {
+    "LossFunction_Final.html": "c43cacbc"
+  },
+  "MSE_Change_FINAL.qmd": {
+    "MSE_Change_FINAL.html": "701b1dd4"
+  },
+  "OLS_Derivation.qmd": {
+    "OLS_Derivation.html": "cd2bfd9a"
+  },
+  "SupervisedLearning.qmd": {
+    "SupervisedLearning.html": "7fe7c05e"
+  },
+  "SupervisedLearningFINAL.qmd": {
+    "SupervisedLearningFINAL.html": "ff07de52"
+  }
+}

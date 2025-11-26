@@ -1,0 +1,234 @@
+# Derivation of OLS Estimator
+
+The Ordinary Least Squares (OLS) estimator is derived by solving a minimization problem. Our objective is to find estimates for the intercept and slope coefficients, denoted $\hat{\beta_0}$ and $\hat{\beta_1}$, that minimize the sum of squared residuals.
+
+## Setting Up the Minimization Problem
+
+We start with the following minimization objective:
+
+$$
+\min_{\hat{\beta_0}, \hat{\beta_1}} \sum_{i=1}^{N} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i)^2
+$$ {#eq-1}
+
+This problem is solved by taking partial derivatives with respect to $\hat{\beta_0}$ and $\hat{\beta_1}$ and setting them to zero.
+
+### Step 1
+
+1.  Take the partial derivative with respect to $\hat{\beta_0}$:
+
+    $$
+    \frac{\partial W}{\partial \hat{\beta_0}} = \sum_{i=1}^{N} -2(y_i - \hat{\beta_0} - \hat{\beta_1} x_i) = 0
+    $$ {#eq-2}
+
+2.  Take the partial derivative with respect to $\hat{\beta_1}$:
+
+    $$
+    \frac{\partial W}{\partial \hat{\beta_1}} = \sum_{i=1}^{N} -2 x_i (y_i - \hat{\beta_0} - \hat{\beta_1} x_i) = 0
+    $$ {#eq-3}
+
+Let $W = \sum_{i=1}^{N} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i)^2$. Now our task is to solve these equations using algebra.
+
+## Solving for $\hat{\beta_0}$
+
+Following from eq.2 we can drop the $-2$ (this is why sometimes you see a loss function with a $\frac{1}{2}$ at the start):
+
+$$
+\sum_{i=1}^{N} (y_i - \hat{\beta_0} - \hat{\beta_1} x_i) = 0
+$$
+
+Expanding and rearranging terms (using:$\quad \sum_{i=1}^{N} y_i = N \bar{y}$), we find:
+
+$$
+N \hat{\beta_0} = \sum_{i=1}^{N} y_i - \hat{\beta_1} \sum_{i=1}^{N} x_i
+$$
+
+Dividing by $N$ gives us:
+
+$$
+\hat{\beta_0} = \bar{y} - \hat{\beta_1} \bar{x}
+$$
+
+where $\bar{y} = \frac{1}{N}\sum_{i=1}^{N} y_i$ and $\bar{x} = \frac{1}{N}\sum_{i=1}^{N} x_i$.
+
+## Solving for $\hat{\beta_1}$
+
+To solve for $\hat{\beta_1}$, remove the $-2$ and rearrange to get $\sum_{i=1}^{N} x_i y_i -  \hat{\beta_0}  x_i - \hat{\beta_1}  x_i^2$ then substitute $\hat{\beta_0} = \bar{y} - \hat{\beta_1} \bar{x}$. This yields:
+
+$$
+\sum_{i=1}^{N} x_i y_i - (\bar{y} -\hat{\beta_1}\bar{x})x_i -  \hat{\beta_1} x_i^2 = 0
+$$
+
+As the summation is applying to everything in th3 above equation, we can distribute the sum to each term (and pull constant terms out in front of the summation) getting:
+
+$$
+\sum_{i=1}^{N} x_i y_i - \bar{y}\sum_{i=1}^{N}x_i + \hat{\beta_1}\bar{x} \sum_{i=1}^{N} x_i - \hat{\beta_1} \sum_{i=1}^{N} x_i^2 = 0
+$$
+
+Using again $\quad \sum_{i=1}^{N} y_i = N \bar{y}$, we solve for $\hat{\beta_1}$ and get
+
+$$
+\hat{\beta_1} = \frac{\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{N} (x_i - \bar{x})^2}
+$$
+
+From here, we then apply $\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y}) = \sum_{i=1}^{N} x_i y_i - N \bar{x} \bar{y}$
+
+::: callout-note
+## Derivation
+
+### Step 1: Expand the Left-Hand Side
+
+$$
+\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y}) = \sum_{i=1}^{N} x_i y_i - N \bar{x} \bar{y}
+$$
+
+We start with the left-hand side:
+
+$$
+\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y})
+$$
+
+Expanding this product:
+
+$$
+= \sum_{i=1}^{N} \left( x_i y_i - x_i \bar{y} - \bar{x} y_i + \bar{x} \bar{y} \right)
+$$
+
+### Step 2: Separate the Summation
+
+Now, we can separate each term inside the summation:
+
+$$
+= \sum_{i=1}^{N} x_i y_i - \sum_{i=1}^{N} x_i \bar{y} - \sum_{i=1}^{N} \bar{x} y_i + \sum_{i=1}^{N} \bar{x} \bar{y}
+$$
+
+### Step 3: Simplify Each Term
+
+Let's simplify each of these four terms:
+
+1.  **First Term**: $\sum_{i=1}^{N} x_i y_i$ remains as it is.
+
+2.  **Second Term**: Since $\bar{y}$ is a constant (the mean of $y$), we can factor it out of the summation:
+
+    $$
+    \sum_{i=1}^{N} x_i \bar{y} = \bar{y} \sum_{i=1}^{N} x_i
+    $$
+
+3.  **Third Term**: Similarly, since $\bar{x}$ is constant, we can factor it out of the summation:
+
+$$
+   \sum_{i=1}^{N} \bar{x} y_i = \bar{x} \sum_{i=1}^{N} y_i
+$$
+
+4.  **Fourth Term**: Since both $\bar{x}$ and $\bar{y}$ are constants, we can factor them both out, giving:
+
+    $$
+    \sum_{i=1}^{N} \bar{x} \bar{y} = N \bar{x} \bar{y}
+    $$
+
+### Step 4: Substitute Back and Simplify
+
+Substitute each of these simplified terms back into the original expression:
+
+$$
+\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y}) = \sum_{i=1}^{N} x_i y_i - \bar{y} \sum_{i=1}^{N} x_i - \bar{x} \sum_{i=1}^{N} y_i + N \bar{x} \bar{y}
+$$
+
+### Step 5: Substitute
+
+Recall that $\bar{x} = \frac{1}{N} \sum\*{i=1}\^{N} x_i$ and $\* \bar{y} = \frac{1}{N} \sum{i=1}\^{N} y_i$. Thus:
+
+$$
+\sum_{i=1}^{N} x_i = N \bar{x} \quad \text{and} \quad \sum_{i=1}^{N} y_i = N \bar{y}
+$$
+
+Substitute these into the expression:
+
+$$
+= \sum_{i=1}^{N} x_i y_i - \bar{y} (N \bar{x}) - \bar{x} (N \bar{y}) + N \bar{x} \bar{y}
+$$
+
+### Step 6: Combine Terms
+
+Notice that the terms $- \bar{y} (N \bar{x})$ and $- \bar{x} (N \bar{y})$ are both equal to $- N \bar{x} \bar{y}$, which cancels with the $+ N \bar{x} \bar{y}$ term:
+
+$$
+= \sum_{i=1}^{N} x_i y_i - N \bar{x} \bar{y}
+$$
+
+### Final Result
+
+We have derived:
+
+$$
+\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y}) = \sum_{i=1}^{N} x_i y_i - N \bar{x} \bar{y}
+$$
+:::
+
+The final OLS estimates are:
+
+1.  **Slope** $\hat{\beta_1}$:
+
+    $$
+    \hat{\beta_1} = \frac{\sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{N} (x_i - \bar{x})^2} = \frac{Cov(x,y)}{Var(x)}
+    $$
+
+2.  **Intercept** $\hat{\beta_0}$:
+
+    $$
+    \hat{\beta_0} = \bar{y} - \hat{\beta_1} \bar{x}
+    $$
+
+------------------------------------------------------------------------
+
+@https://are.berkeley.edu/courses/EEP118/current/derive_ols.pdf
+
+# Exercises
+
+Now lets compute them in R. Going back to our PIMS glucose dataset we have:
+
+```{r}
+#| message: false
+
+library(dplyr)
+library(ggplot2)
+library(mlbench)
+library(tidyverse) 
+library(patchwork)
+
+
+theme_set(theme_bw()) # to help in plot visualization (white background)
+```
+
+```{r}
+data("PimaIndiansDiabetes")
+
+Data <- PimaIndiansDiabetes %>%
+  select(age, glucose, mass) %>%
+  add_rownames(var = "Patient ID")
+
+DataSmaller <- Data[1:80,]
+
+x <- DataSmaller$age
+y <-  DataSmaller$glucose
+
+```
+
+```{r}
+b1hat <- cov(x, y) / var(x)
+b1hat
+```
+
+```{r}
+b0hat = mean(y) - b1hat * mean(x)
+b0hat
+```
+
+```{r}
+fit1 <- lm(y~x, data.frame(x,y))
+# verifying the OLS solution
+summary(fit1)$coeff
+```
+
+They agree exactly! Excellent. So our *lm()* is really doing OLS regression.
+
+Since R does all the calculations for you, it’s not necessary to know how to derive the OLS solutions (especially with more than one independent variable X), but it is handy to know the intuition behind it, especially when we get to more complicated regression.

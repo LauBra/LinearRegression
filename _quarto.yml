@@ -2,7 +2,11 @@ project:
   type: website
   output-dir: docs    # <- add / change this line
   render: 
-  - "*.qmd"
+  - SupervisedLearningFINAL.qmd
+  - LossFunction_Final.qmd 
+  - MSE_Change_FINAL.qmd 
+  - OLS_Derivation.qmd
+  - GradientDescent2.qmd
 
 execute:
   echo: true

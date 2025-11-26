@@ -22,7 +22,7 @@ website:
     search: true
     left:
       - text: "Supervised Learning: Linear Reg and Optimization"
-        file: SupervisedLearning.qmd
+        file: SupervisedLearningFINAL.qmd
  
   sidebar:
     - title: "Supervised Learning: Linear Reg and Optimization"

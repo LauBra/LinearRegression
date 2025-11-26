@@ -10,28 +10,20 @@ library(ggplot2)
 theme_set(theme_bw()) # to help in plot visualization (white background)
 ```
 
-Load diabetes dataset (already available by installing package [mlbench](https://mlbench.github.io)). This is a toy dataset that has been extensively used in many [machine learning examples](https://www.kaggle.com/datasets/mathchi/diabetes-data-set/code)
+Load diabetes dataset as before.
 
 ```{r}
 data("PimaIndiansDiabetes")
 ```
 
-In the environment now you should see PimaIndiansDiabetes dataframe loaded
-
-Lets now select only two of this columns `age` and `glucose` and store it as a new dataframe
+And select only two of this columns `age` and `glucose` and store it as a new dataframe
 
 ```{r}
 Data <- PimaIndiansDiabetes %>%
         select(age, glucose)
 ```
 
-Recall this is the same thing as
-
-```{r}
-Data <- PimaIndiansDiabetes[, c("age", "glucose")]
-```
-
-We have *768* observations/rows, so lets cut it down to just 30, for the sake of easier visualization and take a look
+Lets cut it down to just 80 again, for the sake of easier visualization and take a look
 
 ```{r}
 DataSmaller <- Data[1:80,]
@@ -54,12 +46,14 @@ $$
 Let's calculate the residual for a single data point in the dataset.
 
 ```{r}
-
 DataSmaller <- Data[1:80,]
 # Calcualte error of line (y = 112 + 0.5x)
-DataSmaller$line1 <- 120 + 0.5 * seq(0, 60, length.out = 80)
-DataSmaller$linePredicted <- 120 + 0.5 *DataSmaller$age
+DataSmaller$line1 <- 120 + 0.5 * seq(0, 60, length.out = 80) #made up quation of a line/lienar model
+DataSmaller$linePredicted <- 120 + 0.5 *DataSmaller$age #predicted output
+```
 
+
+```{r}
 ggplot(DataSmaller, aes(x = age, y = glucose)) +
   geom_point(size = 3, color = "black", alpha = 0.7) +  # Larger, colored points with some transparency
   labs(
@@ -169,10 +163,10 @@ Deciding whether to use MAE or MSE can depend on the dataset and the way you wan
 
 When choosing the best loss function, consider how you want the model to treat outliers. For instance, __MSE moves the model more toward the outliers, while MAE doesn't__. L2 loss incurs a much higher penalty for an outlier than L1 loss. 
 
-![MSE vs MAE](/Users/bravol/Desktop/ML Class/Practical/LinearReg_Lecture/MSE_MAE.png){fig-align="center"}
+![MSE vs MAE](MSE_MAE.png){fig-align="center"}
 
 
-Regardless, the functions that we will use that implement linear regression algorithms (e.g `lm()`) take into account MSE error, so this will not be part of any decision we have to take. The reason for this is that MSE has benefits that MAE has not in terms of *optimizimg* it! We will learn about this later.  
+Regardless, the functions that we will use that implement linear regression algorithms (e.g `linear_reg()`) take into account MSE error, so this will not be part of any decision we have to take. The reason for this is that MSE has benefits that MAE has not in terms of *optimizimg* it! We will learn about this later.  
 
 ### Outliers
 
@@ -198,7 +192,9 @@ residuals_MSE <- model_MSE$residuals # can also extract them directly from the m
 Calculate all losses 
 
 ```{r}
+
 error_metrics_MSE <- calculate_errors(residuals_MSE)
+
 ```
 
 Plot linear regression model
@@ -210,6 +206,7 @@ MSE <- ggplot(DataSmaller, aes(x = age, y = glucose)) +
                linetype="dashed", size=1.5) +
   labs(title = "MSE without Outliers", x = "Age", y = "Glucose")
 
+MSE
 ```
 
 Add Outliers
@@ -238,6 +235,7 @@ MSE_Out <- ggplot(DataOutliers, aes(x = age, y = glucose)) +
                linetype="dashed", size=1.5) +
   labs(title = "MSE Outliers", x = "Age", y = "Glucose")
 
+MSE_Out
 
 ```
 
@@ -258,6 +256,7 @@ MSE + MSE_Out
 As key learning points:  MAE vs MSE?
 
 - *Look at the scales!* - MAE is more interpretable as it gives a more straightforward interpretation of the "average error," as it represents the median prediction error.
+
 - Robustness to Outliers: MAE is less sensitive to outliers than MSE because it doesn't square the errors.
 But the functions used to implement linear regression use mostly MSE, because MAE is not differentiable, so it requires specialised optimisation algorithms, which are less computationally efficient than least-squares (MSE) for large datasets as MSE is differentiable and so easier to optimize. (we will learn about what this means later!)
 

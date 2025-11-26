@@ -1,0 +1,149 @@
+---
+title: "(1b) Supervised Learning Models - Python"
+format: html
+jupyter: python3
+---
+
+
+
+We will work with the **Pima Indians Diabetes** dataset in Python. 
+
+```{r, include=FALSE}
+
+
+library(reticulate)
+
+# one-off setup (if you haven't done it yet)
+# install_miniconda()
+
+##conda_create(
+##  envname = "hds-python",
+##  python_version = "3.11",
+##  packages = c("numpy", "pandas", "matplotlib", "seaborn", "scikit-learn")
+##)
+
+use_condaenv("hds-python", required = TRUE)
+#py_config()
+
+#conda_install("hds-python", c("jupyter", "plotly"))
+```
+
+Required Python packages:
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor, plot_tree # new learning algorithm
+from sklearn.tree import export_text
+```
+
+## Load and explore the dataset
+
+We assume the file is called `diabetes.csv` and has at least the columns `Age` and `Glucose`.
+
+```{python}
+
+url="https://raw.githubusercontent.com/npradaschnor/Pima-Indians-Diabetes-Dataset/master/diabetes.csv"
+df = pd.read_csv(url)
+
+df.head()
+```
+
+Let’s select just the `Age` and `Glucose` columns and store them as a new dataframe.
+
+```{python}
+data = df[["Age", "Glucose"]].copy()
+
+data.shape
+```
+
+We have many observations, so to mimic the R example we’ll take just the first 80 rows for easier visualization:
+
+```{python}
+data_small = data.iloc[:80].copy()
+data_small.head()
+```
+
+Now let’s visualize this relationship.
+
+```{python}
+fig, ax = plt.subplots()
+
+ax.scatter(data_small["Age"], data_small["Glucose"])
+ax.set_xlabel("Age (Feature)")
+ax.set_ylabel("Glucose (Label)")
+
+plt.show()
+```
+
+## A Supervised Learning Algorithm: Linear Regression
+
+Suppose we want to predict glucose based on age. We can fit a **learning algorithm** to our dataset and create a **predictive model**. Here the learning algorithm is **linear regression**.
+
+In scikit-learn the standard steps are:
+
+1. Separate features `X` and label `y`.
+2. Create a model object.
+3. Fit the model on the data using `.fit(...)`.
+4. Use `.predict(...)` to obtain predictions.
+
+```{python}
+# 1. Separate X (features) and y (target)
+X = data_small[["Age"]].values  # 2D array
+y = data_small["Glucose"].values  # 1D array
+
+# 2. Define the model
+lin_reg = LinearRegression()
+
+# 3. Fit the model
+lin_reg.fit(X, y)
+```
+
+Let’s look at the learned parameters:
+
+```{python}
+intercept = lin_reg.intercept_
+slope = lin_reg.coef_[0]
+
+intercept, slope
+```
+
+
+## EXERCISE: Understand the role of the dataset in predictive modelling (Decision Trees)
+
+Now we’ll fit a **Decision Tree Regressor** <https://scikit-learn.org/stable/modules/tree.html> to the same data. We’ll see that the model looks quite different from a straight line.
+
+```{python}
+
+tree_reg = DecisionTreeRegressor(max_depth=3)
+
+tree_reg.fit(X, y)
+```
+
+We can look at a text/graphical representation of the tree:
+
+```{python}
+
+#| fig-width: 10
+#| fig-height: 6
+
+fig, ax = plt.subplots(figsize=(10, 6))   # smaller, more realistic size
+
+plot_tree(
+    tree_reg,
+    feature_names=["Age"],
+    filled=True,
+    rounded=True,
+    fontsize=8,        # smaller text
+    max_depth=3,       # show only top levels
+    ax=ax
+)
+
+plt.tight_layout()
+plt.show()
+```
+
+

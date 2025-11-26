@@ -1,4 +1,4 @@
-# (1) Supervised Learning Models
+# (1a) Supervised Learning Models
 
 __Mention that you can just copy the code and insert it as an Rmd!__
 

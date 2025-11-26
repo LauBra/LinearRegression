@@ -1,4 +1,8 @@
-# Derivation of OLS Estimator
+# (5) Derivation of OLS Estimator
+
+```{r, message=FALSE}
+library(tidymodels)
+```
 
 The Ordinary Least Squares (OLS) estimator is derived by solving a minimization problem. Our objective is to find estimates for the intercept and slope coefficients, denoted $\hat{\beta_0}$ and $\hat{\beta_1}$, that minimize the sum of squared residuals.
 
@@ -224,9 +228,18 @@ b0hat
 ```
 
 ```{r}
-fit1 <- lm(y~x, data.frame(x,y))
+
+lm_model <- linear_reg() %>% 
+            set_engine('lm') %>% # adds lm implementation of linear regression
+            set_mode('regression')
+
+
+fit1 <- lm_model %>% 
+          fit(y ~ x, data.frame(x,y))
+
+#fit1 <- lm(y~x, data.frame(x,y))
 # verifying the OLS solution
-summary(fit1)$coeff
+#summary(fit1)$coeff
 ```
 
 They agree exactly! Excellent. So our *lm()* is really doing OLS regression.

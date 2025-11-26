@@ -7,6 +7,7 @@ project:
   - MSE_Change_FINAL.qmd 
   - OLS_Derivation.qmd
   - GradientDescent2.qmd
+  - SupervisedLearning_python.qmd
 
 execute:
   echo: true
@@ -28,11 +29,12 @@ website:
     - title: "Supervised Learning: Linear Reg and Optimization"
       contents:
         - SupervisedLearningFINAL.qmd
+        - SupervisedLearning_python.qmd
         - LossFunction_Final.qmd 
         - MSE_Change_FINAL.qmd 
         - divider: true  # Adds a divider
-        - OLS_Derivation.qmd
         - GradientDescent2.qmd
+        - OLS_Derivation.qmd
   
   page-footer: 
     left: "Copyright 2025, Laura Bravo" 

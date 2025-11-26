@@ -11,36 +11,9 @@ format: html
 library(mlbench)
 library(tidyverse) 
 library(ggplot2)
+library(tidymodels)
 
-theme_set(theme_bw()) # to help in plot visualization (white background)
-```
-
-Load diabetes dataset (already available by installing package [mlbench](https://mlbench.github.io)). This is a toy dataset that has been extensively used in many [machine learning examples](https://www.kaggle.com/datasets/mathchi/diabetes-data-set/code)
-
-```{r}
-data("PimaIndiansDiabetes")
-```
-
-In the environment now you should see PimaIndiansDiabetes dataframe loaded
-
-Lets now select only two of this columns `age` and `glucose` and store it as a new dataframe
-
-```{r}
-Data <- PimaIndiansDiabetes %>%
-        select(age, glucose)
-```
-
-
-Lets implement this loss function in R and test it with our diabetes data.
-
-```{r}
-#| message: false
-
-library(dplyr)
-library(ggplot2)
 library(plot3D)
-library(mlbench)
-library(tidyverse) 
 library(patchwork)
 
 
@@ -106,7 +79,7 @@ mse_practical(beta0 = 3, beta1 = 5, x = age, y= glucose, m =DataPoints)
 
 Now calculate it by hand! Use R as help (big numbers we are dealing with, but make sure you get the concept)
 
-![](/Users/bravol/Desktop/ML Class/Practical/LinearReg_Lecture.jpg){fig-align="center"} Repeat process with B0 = 4 and B1 = 7.
+![](ByHand1.jpg){fig-align="center"} Repeat process with B0 = 4 and B1 = 7.
 Figure continued here: 
 
 ((148 - (253))^2 + (85 - (158))^2 + (183 - (163))^2)/3
@@ -314,13 +287,21 @@ fig
 
 
 
-These parameters are very similar to what we obtained from the `lm()` function (and would be the same if we had sampled the MSE at that accurate decimal point)
+These parameters are very similar to what we obtained from the `linear_reg()` function (and would be the same if we had sampled the MSE at that accurate decimal point)
 
 ```{r}
 
 
-lm(glucose ~ age, data = DataSmaller)
+#lm(glucose ~ age, data = DataSmaller)
 
+lm_model <- linear_reg() %>% 
+            set_engine('lm') %>% # adds lm implementation of linear regression
+            set_mode('regression')
+
+
+fit1 <- lm_model %>% 
+          fit(glucose ~ age, DataSmaller)
+fit1
 
 ```
 

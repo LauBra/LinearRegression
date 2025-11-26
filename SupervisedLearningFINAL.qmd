@@ -15,11 +15,12 @@ Packages needed for this session:
 library(mlbench) #where PimaIndiansDiabetes database is found
 library(tidyverse) #for minimal data wrangling 
 library(ggplot2) #already part of tidyverse - so a bit redundant
+library(tidymodels) #for modeling
 
 theme_set(theme_bw()) # to help in plot visualization (white background)
 ```
 
-Load diabetes dataset (already available by installing package [mlbench](https://mlbench.github.io)). This is a toy dataset that has been extensively used in many [machine learning examples](https://www.kaggle.com/datasets/mathchi/diabetes-data-set/code)
+Load diabetes dataset (already available by installing package [mlbench](https://mlbench.github.io)). As described yesterday, this is a very popular dataset and examples of its use can be found here: [machine learning examples](https://www.kaggle.com/datasets/mathchi/diabetes-data-set/code)
 
 ```{r}
 data("PimaIndiansDiabetes")
@@ -34,13 +35,7 @@ Data <- PimaIndiansDiabetes %>%
         select(age, glucose)
 ```
 
-Recall this is the same thing as the below code, but using the library tidyverse's data wrangling options. For more learning check the exercise from data pre-processing class: <https://rintrouob.quarto.pub/hds-msc---module-3---preprocessingeda/HealthyR_Summary.html>
-
-```{r}
-Data <- PimaIndiansDiabetes[, c("age", "glucose")]
-```
-
-We have *768* observations/rows, so lets cut it down to just 30, for the sake of easier visualization and take a look
+We have *768* observations/rows, so lets cut it down to just 80, for the sake of easier visualization and take a look
 
 ```{r}
 DataSmaller <- Data[1:80,]
@@ -64,7 +59,7 @@ labs(x = "Age (Feature)", y = "Glucose (Label)")
 
 ## A Supervised Learning Algorithm: Linear Regression
 
-Suppose we want to predict our glucose level based on our age with this dataset. We could fit a learning algorithm to our dataset and create a predictive model. In this case the *learning algorithm* is going to be *linear regression*. ggplot already contains the functionality of fitting and visualizing this linear regression model through `geom_smooth` as seen below:
+Suppose we want to predict our glucose level based on our age with this dataset. We could fit a learning algorithm to our dataset and create a predictive model. In this case the *learning algorithm* is going to be *linear regression*. ggplot already contains the functionality of fitting and visualizing this linear regression model through `geom_smooth` as seen below (this is the solution from the practical from the first day):
 
 ```{r}
 #| fig-align: 'center'
@@ -95,27 +90,29 @@ where
 -   \beta\_1 = weight of the feature/column/x 1 - same as slope in equation of a line (if we only had 2 dimensions) and is a *parameter* of the model
 -   x_1 = feature/column 1/ input data
 
-And how do we find out the two paramters? They are the result of *fitting* the learning algorithm (linear regression) to the data. Once we have them defined, we can then say we have the predictive algorithm where, if we were to have a new sample ($x_i$) with age information, we could find out the predicted glucose ($y_i'$).
+And how do we find out the two parameters? They are the result of *fitting* the learning algorithm (linear regression) to the data. Once we have them defined, we can then say we have the predictive algorithm where, if we were to have a new sample ($x_i$) with age information, we could find out the predicted glucose ($y_i'$).
 
-As you will see later, te way this *fitting* works, is by finding the parameters \beta\_0 and \beta\_1 which make the best fit line.And this is calculated through *optimization* of the *loss/cost function* through either *ordinary least squares (OLS)* or *gradient descent* (do not worry about this just now!)
+As you will see later, the way this *fitting* works, is by finding the parameters \beta\_0 and \beta\_1 which make the best fit line.And this is calculated through *optimization* of the *loss/cost function* through either *ordinary least squares (OLS)* or *gradient descent* (do not worry about this just now!)
 
-More specifically, when you use the function `lm` below or any other function that fits a linear model in R or Python, \beta\_0 and \beta\_1 or \beta\_n (depending on the amount of features you are including in your model) are being calculated using *OLS*
+More specifically, when you use the function below `linear_reg()` or any other function that fits a linear model in R or Python, \beta\_0 and \beta\_1 or \beta\_n (depending on the amount of features you are including in your model) are being calculated using *OLS*
 
 ```{r}
 
-#ls_fit <- lm(y ~ x, data = data)`
-ls_fit <- lm(glucose ~ age, data = DataSmaller)
+lm_model <- linear_reg() %>% 
+            set_engine('lm') %>% # adds lm implementation of linear regression
+            set_mode('regression')
+
+
+ls_fit <- lm_model %>% 
+          fit(glucose ~ age, DataSmaller)
+
 
 ```
 
-Display a summary of fit
-
-```{r}
-summary(ls_fit)
+```{ls_fit[["fit"]][["coefficients"]]}
 ```
 
-```{r}
-coef(ls_fit)
+```{}
 ```
 
 If we include this coefficients and draw the line ourselves, we will obtain the same thing as the `geom_smooth` above.
@@ -129,12 +126,12 @@ If we include this coefficients and draw the line ourselves, we will obtain the 
 ggplot(DataSmaller, aes(x = age, y = glucose)) + 
 geom_point() + 
 labs(x = "Age (Feature)", y = "Glucose (Label)") +  
-geom_abline(intercept = coef(ls_fit)[1], slope = coef(ls_fit)[2], color="red",
+geom_abline(intercept = ls_fit[["fit"]][["coefficients"]][1], slope = ls_fit[["fit"]][["coefficients"]][2], color="red",
                linetype="dashed", size=1.5)
 
 ```
 
-The predictive model then (with fiited parameters) is:
+The predictive model then (with fitted parameters) is:
 
 $$
 glucose = 73.68 + 1.33*age
@@ -151,7 +148,7 @@ print(predicted_glucose)
 This is the same as doing:
 
 ```{r}
-predict(ls_fit, newdata = data.frame(age = 45)) # we had to create a new dataframe with one value of age for this to work, as it normally expects more than 1 smple, and more features!
+predict(ls_fit, new_data = data.frame(age = 45)) # we had to create a new dataframe with one value of age for this to work, as it normally expects more than 1 smple, and more features!
 ```
 
 ```{r}
@@ -188,37 +185,49 @@ Yes we can! Another thing is how confident we are about the predicted value, but
 
 ### EXERCISE: Understand the role of the dataset in predictive modelling
 
-Lets fit the decision tree learning algorithm in different number of training points (you will learn more about how decision trees work next Monday, but as you have seen in the previous classes, learning algorithms are already coded for you as functions, so you can apply them already)
+Lets fit the decision tree learning algorithm in different number of training points (you will learn more about how decision trees work next Tuesday, but as you have seen in the previous classes, learning algorithms are already coded for you as functions, so you can apply them already)
 
 ```{r}
-library(rpart) #has functions for decision tree algorithm
+
+dt_model <- decision_tree() %>% 
+            set_engine('rpart') %>% # check out what the rpart library/engine is about
+            set_mode('regression')
+
+
+dt_fit <- dt_model %>% 
+          fit(glucose ~ age, DataSmaller)
+
+
+
+```
+
+Check out what the fitted model consist of, and print out the information the model encodes (open ls_fit too and see)
+
+```{r}
+#View(dt_fit)
+dt_fit[["fit"]]
+```
+
+Now lets plot the model to get a better idea of what it is doing ( this would be the same as priniting out the intercept and coefficients for a linear regression algorithm )
+
+```{r}
+
 library(rpart.plot)
-library(ggplot2)
-
-#Decision tree algorithm
-tree_model <- rpart(glucose ~ age, data = DataSmaller, method = "anova")
-
 # Plot the decision tree
-rpart.plot(tree_model, type = 3, fallen.leaves = TRUE, box.palette = "Blues", shadow.col = "gray")
+rpart.plot(dt_fit[["fit"]], type = 3, fallen.leaves = TRUE, box.palette = "Blues", shadow.col = "gray")
 
 
 ```
 
-```{r}
-# Print the model for further details
-print(tree_model)
-```
+
 
 ```{r}
 #Get the predicted glucose values 
-DataSmaller$predicted_glucose <- predict(tree_model, newdata = DataSmaller)
+DataSmaller$predicted_glucose <- predict(dt_fit, new_data = DataSmaller)$.pred
 ```
 
 This we are now introducing the dataset that we fitted our learning algorithm on, as if they were new samples we want to have glucose predicted on. Do you see how the real value and the predicted one differ? The closer we can get them to be the better model we will have!
 
-```{r}
-View(DataSmaller)
-```
 
 **STOP HERE AND MAKE SURE YOU HAVE UNDERSTOOD THIS CONCEPT**
 
@@ -228,8 +237,7 @@ Do these plots help understand?
 
  ggplot(DataSmaller, aes(x = age, y = glucose)) +
     geom_point(size = 3, color = "blue", alpha = 0.7) +  # Larger, colored points with some transparency
- geom_step( aes(y = predicted_glucose), colour = "darkred", size = 2) +  # Step function for
-    #geom_step(aes(y = predicted_glucose), colour = "darkred",  size = 2) +  # 
+    geom_step( aes(y = predicted_glucose), colour = "darkred", size = 2) + 
     labs(
       x = "Age (years)",
       y = "Glucose Level (mmol/L)") +
